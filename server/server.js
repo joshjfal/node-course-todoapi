@@ -25,6 +25,15 @@ app.post("/todos", (req, res) => {
   });
 });
 
+app.get("/todos", (req, res) => {
+  //Todo.find returns everything in the Todo collection (DB) back
+  Todo.find().then((todos) => {
+    res.send({todos}); // Rather than just returning the array (without squiggly brackets), we are returning an object containing the array so that we could create other pass backs like "{todos}, \n text:'Josh is great'".
+  }, (e) => {
+    res.status(400).send(e);
+  });
+});
+
 app.listen(3000, () => {
   console.log("Started listening on port 3000");
 });
