@@ -1,9 +1,9 @@
 var mongoose = require("mongoose");
 
-var addUser = mongoose.model("addUser", {
+var Users = mongoose.model("Users", {
   fullname: {
     type: String,
-    required: true,
+    required: false,
     minlength: 1,
     trim: true
   },
@@ -18,4 +18,4 @@ var addUser = mongoose.model("addUser", {
   }
 });
 
-module.exports = { addUser };
+module.exports = { Users };
