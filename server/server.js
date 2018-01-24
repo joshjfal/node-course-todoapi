@@ -8,6 +8,7 @@ var {addUser} = require("./models/user");
 var {ObjectID} = require("mongodb"); //Lecture 78
 
 var app = express();
+const port = process.env.PORT || 3000; //Set if app is running on heroku, won't be set if local
 
 //Tip: CRUD means create, read, update, delete
 
@@ -51,8 +52,8 @@ app.get("/todos/:id", (req, res) => {
   }).catch((e) => res.status(400).send(e));
 });
 
-app.listen(3000, () => {
-  console.log("Started listening on port 3000");
+app.listen(port, () => {
+  console.log(`Started listening on port ${port}`);
 });
 
 module.exports = {app};
