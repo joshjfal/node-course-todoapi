@@ -1,11 +1,11 @@
-var express = require("express");
-var bodyParser = require("body-parser");
+const _ = require("lodash");
+const express = require("express");
+const bodyParser = require("body-parser");
+const {ObjectID} = require("mongodb"); //Lecture 78
 
 var {mongoose} = require("./db/mongoose");
 var {Todo} = require("./models/todo");
 var {addUser} = require("./models/user");
-
-var {ObjectID} = require("mongodb"); //Lecture 78
 
 var app = express();
 const port = process.env.PORT || 3000; //Set if app is running on heroku, won't be set if local
@@ -67,6 +67,37 @@ app.delete("/todos/:id", (req, res) => {
 
       res.send({todo});
   }).catch((e) => res.status(400).send());
+});
+
+app.patch("/todos/:id", (req, res) => {
+  var id = req.params.id;
+  //__Subset of the things that the user past to us, don't want them to update anything they want.
+  var body = _.pick(req.body, ['text', 'completed']); // prevents user from updating IDs, completedAt, or any other properties. Only works with the picked out nodes.
+
+  if (!ObjectID.isValid(id)) {
+    return res.status(404).send();
+  }
+
+  //__Update completedAt property based on the completed property
+  if (_.isBoolean(body.completed) && body.completed) {
+    // Run if boolean and true
+    body.completedAt = new Date().getTime(); //Returns JS timestamp (number of MS since midnights of Jan 1st 1970 [This is called a Unix epic], values greater than zero are since that date, negatives are before
+  } else {
+    // Run if it is a boolean or it's not true
+    body.completed = false;
+    body.completedAt = null; // To remove value from database, set it to null.
+  }
+
+  //__Find by ID and then update it
+  Todo.findByIdAndUpdate(id, {$set: body}, {new: true}).then((todo) => {
+    if (!todo) {
+      return res.status(404).send();
+    }
+
+    res.send({todo});
+  }).catch((e) => {
+    res.status(400).send();
+  });
 });
 
 app.listen(port, () => {
